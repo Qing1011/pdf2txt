@@ -2,45 +2,18 @@
 # coding: utf-8
 from __future__ import unicode_literals
 from __future__ import print_function
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
-from cStringIO import StringIO
+
 from bs4 import BeautifulSoup
 import codecs
 import csv  
 import sys 
 import os
 
+import pdf2txt as p2t
+
 reload(sys) 
 # print (sys.getdefaultencoding())
 sys.setdefaultencoding("utf-8")
-
-
-def convert_pdf_to_txt(path):
-    rsrcmgr = PDFResourceManager()
-    retstr = StringIO()
-    codec = 'utf-8'
-    laparams = LAParams()
-    device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
-    fp = file(path, 'rb')
-    interpreter = PDFPageInterpreter(rsrcmgr, device)
-    password = ""
-    maxpages = 0
-    caching = True
-    pagenos=set()
-
-    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,caching=caching, check_extractable=True):
-        interpreter.process_page(page)
-
-    text = retstr.getvalue()
-
-    fp.close()
-    device.close()
-    retstr.close()
-    return text
-
 
 def getallpdffilename(path):
     pdffilenames=[]
@@ -52,8 +25,6 @@ def getallpdffilename(path):
 
 names = getallpdffilename('pdf')
 
-
-
 data=[('company_name','report')]
 
 
@@ -61,7 +32,7 @@ for name in names:
 	print (name)
 
 for name in names:
-	result = convert_pdf_to_txt(name)
+	result = p2t.convert_pdf_to_txt(name)
         soup = BeautifulSoup(result)
         a_text_b = soup.get_text()
         print (len(a_text_b))
